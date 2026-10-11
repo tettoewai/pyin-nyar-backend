@@ -1,0 +1,407 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+// ---------- Enums ----------
+
+enum Role {
+  STUDENT
+  PARENT
+  TEACHER
+  ADMIN
+}
+
+enum Language {
+  EN
+  MY
+  BILINGUAL
+}
+
+enum Grade {
+  KINDERGARTEN
+  GRADE_1
+  GRADE_2
+  GRADE_3
+  GRADE_4
+  GRADE_5
+  GRADE_6
+  GRADE_7
+  GRADE_8
+  GRADE_9
+  GRADE_10
+  GRADE_11
+  GRADE_12
+}
+
+enum MessageRole {
+  SYSTEM
+  USER
+  ASSISTANT
+  TOOL
+}
+
+enum QuestionType {
+  MCQ
+  TRUE_FALSE
+  FILL_BLANK
+  SHORT_ANSWER
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum UploadType {
+  IMAGE
+  PDF
+  TEXT
+}
+
+enum StudyPlanStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+}
+
+// ---------- Users & Profiles ----------
+
+model User {
+  id             String   @id @default(cuid())
+  email          String?  @unique
+  passwordHash   String?
+  name           String?
+  role           Role     @default(STUDENT)
+  language       Language @default(BILINGUAL)
+  grade          Grade?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  profile       Profile?
+  sessions      Session[]
+  conversations Conversation[]
+  uploads       Upload[]
+  quizzes       Quiz[]
+  quizAttempts  QuizAttempt[]
+  masteryScores MasteryScore[]
+  studyPlans    StudyPlan[]
+  usageLogs     UsageLog[]
+  answers       Answer[]
+}
+
+model Profile {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetExam   String?
+  studyGoal    String?
+  dailyGoalXp  Int       @default(0)
+  streakDays   Int       @default(0)
+  lastActiveAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// ---------- Sessions / Auth ----------
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String   @unique // sha256(refreshToken)
+  userAgent  String?
+  ip         String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+  
+  @@index([userId, expiresAt])
+}
+
+model OtpChallenge {
+  id         String    @id @default(cuid())
+  email      String
+  purpose    String    @default("login")
+  codeHash   String
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  @@index([email, purpose, createdAt])
+  @@index([expiresAt])
+}
+
+// ---------- Curriculum ----------
+
+model Subject {
+  id             String   @id @default(cuid())
+  name           String
+  code           String?
+  grade          Grade?
+  chapters       Chapter[]
+  conversations  Conversation[]
+  quizzes        Quiz[]
+  masteryScores  MasteryScore[]
+  studyPlanItems StudyPlanItem[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([name, code, grade])
+}
+
+model Chapter {
+  id             String   @id @default(cuid())
+  subjectId      String
+  subject        Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  name           String
+  order          Int
+  lessons        Lesson[]
+  conversations  Conversation[]
+  quizzes        Quiz[]
+  masteryScores  MasteryScore[]
+  studyPlanItems StudyPlanItem[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([subjectId, name])
+}
+
+model Lesson {
+  id             String   @id @default(cuid())
+  chapterId      String
+  chapter        Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  name           String
+  order          Int
+  content        String?  // markdown or plain text
+  conversations  Conversation[]
+  quizzes        Quiz[]
+  masteryScores  MasteryScore[]
+  studyPlanItems StudyPlanItem[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([chapterId, name])
+}
+
+// ---------- Chat / Tutor ----------
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  subjectId String?
+  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  chapterId String?
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  lessonId  String?
+  lesson    Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  language  Language @default(EN)
+  messages  Message[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+model Message {
+  id               String       @id @default(cuid())
+  conversationId   String
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role             MessageRole
+  content          String
+  model            String?
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  createdAt        DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+// ---------- Uploads / OCR ----------
+
+model Upload {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          UploadType
+  url           String
+  filename      String?
+  mimeType      String?  // e.g. "image/png", "application/pdf"
+  size          Int?
+  extractedText String?
+  quizzes       Quiz[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+// ---------- Quizzes ----------
+
+model Quiz {
+  id             String     @id @default(cuid())
+  userId         String?    // null for system/template quizzes
+  user           User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  title          String
+  subjectId      String?
+  subject        Subject?   @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  chapterId      String?
+  chapter        Chapter?   @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  lessonId       String?
+  lesson         Lesson?    @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  difficulty     Difficulty @default(MEDIUM)
+  sourceUploadId String?
+  sourceUpload   Upload?    @relation(fields: [sourceUploadId], references: [id], onDelete: SetNull)
+  questions      Question[]
+  attempts       QuizAttempt[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  quizId      String
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  type        QuestionType
+  question    String
+  options     Json?        // e.g. [{ id: "A", text: "..." }]
+  answer      String
+  explanation String?
+  order       Int
+  points      Int          @default(1)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  answers     Answer[]
+
+  @@index([quizId, order])
+}
+
+model QuizAttempt {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId      String
+  quiz        Quiz          @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  status      AttemptStatus @default(IN_PROGRESS)
+  score       Float?
+  startedAt   DateTime      @default(now())
+  completedAt DateTime?
+  answers     Answer[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId, startedAt])
+  @@index([quizId, status])
+}
+
+model Answer {
+  id           String      @id @default(cuid())
+  attemptId    String
+  attempt      QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId   String
+  question     Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userAnswer   String
+  isCorrect    Boolean
+  timeSpentSec Int?
+  createdAt    DateTime    @default(now())
+
+  @@unique([attemptId, questionId])
+  @@index([userId, createdAt])
+}
+
+// ---------- Mastery / Weakness Detection ----------
+
+model MasteryScore {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId String?
+  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  chapterId String?
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  lessonId  String?
+  lesson    Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  score     Float    @default(0) // 0.0 – 1.0
+  attempts  Int      @default(0)
+  lastSeen  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+  @@index([userId, score])
+}
+
+// ---------- Study Plans ----------
+
+model StudyPlan {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  status    StudyPlanStatus @default(ACTIVE)
+  startDate DateTime        @default(now())
+  endDate   DateTime?
+  items     StudyPlanItem[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([userId, status])
+}
+
+model StudyPlanItem {
+  id          String    @id @default(cuid())
+  studyPlanId String
+  studyPlan   StudyPlan @relation(fields: [studyPlanId], references: [id], onDelete: Cascade)
+  subjectId   String?
+  subject     Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  chapterId   String?
+  chapter     Chapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  lessonId    String?
+  lesson      Lesson?   @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  order       Int
+  completed   Boolean   @default(false)
+  dueDate     DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([studyPlanId, order])
+}
+
+// ---------- Usage / Quota ----------
+
+model UsageLog {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action           String   // "chat", "quiz", "ocr", etc.
+  model            String?
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
