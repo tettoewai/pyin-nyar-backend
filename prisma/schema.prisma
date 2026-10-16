@@ -87,6 +87,8 @@ model User {
   email          String?  @unique
   passwordHash   String?
   name           String?
+  googleId       String?  @unique
+  avatarUrl      String?
   role           Role     @default(STUDENT)
   language       Language @default(BILINGUAL)
   grade          Grade?

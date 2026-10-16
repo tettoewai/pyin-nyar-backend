@@ -17,6 +17,10 @@ import { SignupDto } from "./dto/sign-up.dto.js";
 import { OtpService } from "./otp.service.js";
 import { TokenService } from "./token.service.js";
 import type { AccessPayload } from "./token.service.js";
+import { GoogleLoginDto } from "./dto/google-login.dto.js";
+import { VerifyResetDto } from "./dto/verify-reset.dto.js";
+import { ConfrimResetDto } from "./dto/confirm-reset.dto.js";
+import { Throttle } from "@nestjs/throttler";
 
 @Controller("auth")
 export class AuthController {
@@ -32,6 +36,7 @@ export class AuthController {
     return this.authService.me(user.sub);
   }
 
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post("/otp/request")
   requestOtp(@Body() body: RequestOtpDto) {
     return this.otpService.requestOtp(body.email, body.purpose);
@@ -62,6 +67,29 @@ export class AuthController {
       ip,
       userAgent: ua,
     });
+  }
+
+  @Post("/reset-password/verify")
+  verifyReset(@Body() body: VerifyResetDto) {
+    return this.authService.verifyResetOtp(body.email, body.otp);
+  }
+
+  @Post("/reset-password/confirm")
+  confirmReset(@Body() body: ConfrimResetDto) {
+    return this.authService.confirmResetPassword(
+      body.resetToken,
+      body.password,
+      body.confirmPassword,
+    );
+  }
+
+  @Post("/google")
+  google(
+    @Ip() ip: string,
+    @Headers("user-agent") ua: string,
+    @Body() body: GoogleLoginDto,
+  ) {
+    return this.authService.googleLogin(body.idToken, { ip, userAgent: ua });
   }
 
   @Post("/refresh")

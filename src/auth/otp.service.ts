@@ -3,13 +3,15 @@ import {
   HttpStatus,
   Injectable,
   Logger,
+  NotFoundException,
   ServiceUnavailableException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
-import { EmailService } from '../email/email.service.js';
-import { PrismaService } from '../prisma/prisma.service.js';
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
+import { EmailService } from "../email/email.service.js";
+import { PrismaService } from "../prisma/prisma.service.js";
+import { NotFoundError } from "rxjs";
 
 const OTP_TTL_MS = 5 * 60 * 1000;
 const OTP_COOLDOWN_MS = 60 * 1000;
@@ -17,7 +19,7 @@ const OTP_MAX_PER_HOUR = 5;
 const OTP_MAX_ATTEMPTS = 5;
 const OTP_LENGTH = 6;
 
-export type OtpPurpose = 'signup' | 'reset-password';
+export type OtpPurpose = "signup" | "reset-password";
 
 @Injectable()
 export class OtpService {
@@ -29,29 +31,37 @@ export class OtpService {
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
   ) {
-    this.pepper = this.configService.getOrThrow<string>('OTP_PEPPER');
+    this.pepper = this.configService.getOrThrow<string>("OTP_PEPPER");
     if (!this.pepper || this.pepper.length < 32) {
       throw new Error(
-        'OTP_PEPPER must be set and at least 32 characters long.',
+        "OTP_PEPPER must be set and at least 32 characters long.",
       );
     }
   }
 
   private hashOtp(otp: string): string {
-    return createHmac('sha256', this.pepper).update(otp).digest('hex');
+    return createHmac("sha256", this.pepper).update(otp).digest("hex");
   }
 
   async requestOtp(
     email: string,
-    purpose: OtpPurpose = 'signup',
+    purpose: OtpPurpose = "signup",
   ): Promise<{ expiresInSec: number; retryAfterSec: number }> {
     const normalizedEmail = email.toLowerCase().trim();
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
+    if (purpose === "reset-password") {
+      const user = await this.prisma.user.findUnique({
+        where: { email: normalizedEmail },
+      });
+      if (!user)
+        throw new NotFoundException("No account found with this email");
+    }
+
     const otp = randomInt(0, 10 ** OTP_LENGTH)
       .toString()
-      .padStart(OTP_LENGTH, '0');
+      .padStart(OTP_LENGTH, "0");
     const codeHash = this.hashOtp(otp);
     const expiresAt = new Date(now.getTime() + OTP_TTL_MS);
     const lockKey = `${normalizedEmail}:${purpose}`;
@@ -66,7 +76,7 @@ export class OtpService {
         const [latest, recentCount] = await Promise.all([
           tx.otpChallenge.findFirst({
             where: { email: normalizedEmail, purpose },
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: "desc" },
           }),
           tx.otpChallenge.count({
             where: {
@@ -93,7 +103,7 @@ export class OtpService {
         // OTP Limit
         if (recentCount >= OTP_MAX_PER_HOUR) {
           throw new HttpException(
-            'Too many OTP requests. Please try again later',
+            "Too many OTP requests. Please try again later",
             HttpStatus.TOO_MANY_REQUESTS,
           );
         }
@@ -107,9 +117,9 @@ export class OtpService {
       });
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      this.logger.error('Failed to create OTP challenge', error);
+      this.logger.error("Failed to create OTP challenge", error);
       throw new ServiceUnavailableException(
-        'Failed to create OTP. Please try again.',
+        "Failed to create OTP. Please try again.",
       );
     }
 
@@ -118,7 +128,7 @@ export class OtpService {
     } catch (error: any) {
       this.logger.error(`[request otp] email error: ${error}`);
       throw new ServiceUnavailableException(
-        'Failed to send OTP email. Please try again.',
+        "Failed to send OTP email. Please try again.",
       );
     }
 
@@ -129,13 +139,13 @@ export class OtpService {
   }
 
   private async sendOtpEmail(email: string, otp: string): Promise<void> {
-    if (this.configService.get<string>('NODE_ENV') !== 'production') {
+    if (this.configService.get<string>("NODE_ENV") !== "production") {
       this.logger.log(`[DEV] OTP for ${email}: ${otp}`);
       return;
     }
-    const subject = 'Your PyinNyar verification code';
+    const subject = "Your PyinNyar verification code";
     const text = `PyinNyar - Your verification code is ${otp}. It expires in 5 minutes.\n\nIf you did not request this, you can ignore this email.`;
-    const spacedOtp = otp.split('').join(' ');
+    const spacedOtp = otp.split("").join(" ");
     const html = `<!doctype html><html><body style="margin:0;padding:0;background-color:#FFF7F3;">
 <div style="background-color:#FFF7F3;margin:0;padding:24px 16px;font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans Myanmar',sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
@@ -172,7 +182,7 @@ export class OtpService {
     } catch (err) {
       this.logger.error(`OTP email delivery failed for ${email}`, err as Error);
       throw new ServiceUnavailableException(
-        'Failed to send OTP email. Please try again.',
+        "Failed to send OTP email. Please try again.",
       );
     }
   }
@@ -180,8 +190,8 @@ export class OtpService {
   async verifyOtp(
     email: string,
     code: string,
-    purpose: OtpPurpose = 'signup',
-  ): Promise<void> {
+    purpose: OtpPurpose = "signup",
+  ): Promise<string> {
     const normalizedEmail = email.toLowerCase().trim();
     const now = new Date();
 
@@ -193,15 +203,15 @@ export class OtpService {
         purpose,
         expiresAt: { gt: now },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     if (!challenge || challenge.consumedAt) {
-      throw new UnauthorizedException('Invalid or expired OTP.');
+      throw new UnauthorizedException("Invalid or expired OTP.");
     }
 
     if (challenge.attempts >= OTP_MAX_ATTEMPTS) {
-      throw new UnauthorizedException('Invalid or expired OTP.');
+      throw new UnauthorizedException("Invalid or expired OTP.");
     }
 
     // Reserve an attempt first. Only one request can take each remaining slot.
@@ -216,22 +226,22 @@ export class OtpService {
     });
 
     if (reserved.count === 0) {
-      throw new UnauthorizedException('Invalid or expired OTP.');
+      throw new UnauthorizedException("Invalid or expired OTP.");
     }
 
     const candidateHash = this.hashOtp(code.trim());
     let match = false;
     try {
       match = timingSafeEqual(
-        Buffer.from(challenge.codeHash, 'hex'),
-        Buffer.from(candidateHash, 'hex'),
+        Buffer.from(challenge.codeHash, "hex"),
+        Buffer.from(candidateHash, "hex"),
       );
     } catch {
       match = false;
     }
 
     if (!match) {
-      throw new UnauthorizedException('Invalid or expired OTP.');
+      throw new UnauthorizedException("Invalid or expired OTP.");
     }
 
     const consumed = await this.prisma.otpChallenge.updateMany({
@@ -245,7 +255,8 @@ export class OtpService {
     });
 
     if (consumed.count === 0) {
-      throw new UnauthorizedException('Invalid or expired OTP.');
+      throw new UnauthorizedException("Invalid or expired OTP.");
     }
+    return challenge.id;
   }
 }
