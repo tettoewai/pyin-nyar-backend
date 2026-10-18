@@ -19,7 +19,7 @@ import { TokenService } from "./token.service.js";
 import type { AccessPayload } from "./token.service.js";
 import { GoogleLoginDto } from "./dto/google-login.dto.js";
 import { VerifyResetDto } from "./dto/verify-reset.dto.js";
-import { ConfrimResetDto } from "./dto/confirm-reset.dto.js";
+import { ConfirmResetDto } from "./dto/confirm-reset.dto.js";
 import { Throttle } from "@nestjs/throttler";
 
 @Controller("auth")
@@ -30,7 +30,7 @@ export class AuthController {
     private readonly tokenService: TokenService,
   ) {}
 
-  @Get("me")
+  @Get("/me")
   @UseGuards(AuthGuard)
   me(@CurrentUser() user: AccessPayload) {
     return this.authService.me(user.sub);
@@ -75,7 +75,7 @@ export class AuthController {
   }
 
   @Post("/reset-password/confirm")
-  confirmReset(@Body() body: ConfrimResetDto) {
+  confirmReset(@Body() body: ConfirmResetDto) {
     return this.authService.confirmResetPassword(
       body.resetToken,
       body.password,

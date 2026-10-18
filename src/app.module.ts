@@ -7,6 +7,8 @@ import { EmailModule } from "./email/email.module.js";
 import { AuthModule } from "./auth/auth.module.js";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
+import { SubjectModule } from './subject/subject.module.js';
+import { StudentKycModule } from './student-kyc/student-kyc.module.js';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { APP_GUARD } from "@nestjs/core";
     PrismaModule,
     EmailModule,
     AuthModule,
+    SubjectModule,
+    StudentKycModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

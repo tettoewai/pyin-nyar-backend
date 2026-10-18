@@ -1,27 +1,42 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class SignupDto {
-  @ApiProperty({ description: 'A valid email to create an account' })
+  @ApiProperty({
+    description: "A valid email to create an account",
+    example: "student@example.com",
+  })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email!: string;
 
-  @ApiProperty({ description: 'Password for the new account' })
+  @ApiProperty({
+    description: "Password for the new account",
+    example: "secret123",
+    minLength: 6,
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(6)
-  password: string;
+  password!: string;
 
-  @ApiProperty({ description: 'Confirm password for the new account' })
+  @ApiProperty({
+    description: "Confirm password for the new account",
+    example: "secret123",
+    minLength: 6,
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(6)
-  confirmPassword: string;
+  confirmPassword!: string;
 
-  @ApiProperty({ description: 'One-Time Password for email verification' })
+  @ApiProperty({
+    description: "One-Time Password for email verification",
+    example: "123456",
+    minLength: 6,
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(6)
-  otp: string;
+  otp!: string;
 }

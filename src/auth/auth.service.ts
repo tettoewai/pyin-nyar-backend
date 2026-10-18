@@ -5,15 +5,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service.js";
-import { OtpService } from "./otp.service.js";
-import * as argon2 from "argon2";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { TokenService } from "./token.service.js";
-import { OAuth2Client } from "google-auth-library";
 import { ConfigService } from "@nestjs/config";
-import { Role } from "../generated/prisma/enums.js";
 import { JwtService } from "@nestjs/jwt";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import * as argon2 from "argon2";
+import { OAuth2Client } from "google-auth-library";
+import { PrismaService } from "../prisma/prisma.service.js";
+import { dataOf } from "../common/api-response.js";
+import { OtpService } from "./otp.service.js";
+import { TokenService } from "./token.service.js";
 
 @Injectable()
 export class AuthService {
@@ -63,7 +63,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException("User not found.");
     }
-    return user;
+    return dataOf(user);
   }
 
   async signup(

@@ -11,6 +11,7 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 // ---------- Enums ----------
 
 enum Role {
@@ -80,20 +81,37 @@ enum StudyPlanStatus {
   PAUSED
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum KycDocType {
+  STUDENT_CARD
+  NRC
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // ---------- Users & Profiles ----------
 
 model User {
-  id             String   @id @default(cuid())
-  email          String?  @unique
-  passwordHash   String?
-  name           String?
-  googleId       String?  @unique
-  avatarUrl      String?
-  role           Role     @default(STUDENT)
-  language       Language @default(BILINGUAL)
-  grade          Grade?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String   @id @default(cuid())
+  email        String?  @unique
+  passwordHash String?
+  name         String?
+  googleId     String?  @unique
+  avatarUrl    String?
+  role         Role     @default(STUDENT)
+  language     Language @default(BILINGUAL)
+  grade        Grade?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   profile       Profile?
   sessions      Session[]
@@ -105,6 +123,7 @@ model User {
   studyPlans    StudyPlan[]
   usageLogs     UsageLog[]
   answers       Answer[]
+  studentKyc    StudentKyc?
 }
 
 model Profile {
@@ -120,19 +139,40 @@ model Profile {
   updatedAt    DateTime  @updatedAt
 }
 
+model StudentKyc {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // all encrypted at rest (AES-256-GCM, format: v1:iv:tag:ciphertext base64)
+  dateOfBirth     String
+  gender          String
+  docType         KycDocType      // non-PII enum, can stay plain
+  docNumber       String
+  docNumberIndex  String    @unique // HMAC-SHA256 blind index for lookups/dup checks
+  school          String
+  region          String
+  guardianPhone   String
+
+  preferredSubjects Subject[] @relation("PreferredSubjects")
+  status          KycStatus  @default(PENDING)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
 // ---------- Sessions / Auth ----------
 
 model Session {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash  String   @unique // sha256(refreshToken)
-  userAgent  String?
-  ip         String?
-  expiresAt  DateTime
-  revokedAt  DateTime?
-  createdAt  DateTime @default(now())
-  
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique // sha256(refreshToken)
+  userAgent String?
+  ip        String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
   @@index([userId, expiresAt])
 }
 
@@ -153,7 +193,7 @@ model OtpChallenge {
 // ---------- Curriculum ----------
 
 model Subject {
-  id             String   @id @default(cuid())
+  id             String          @id @default(cuid())
   name           String
   code           String?
   grade          Grade?
@@ -162,16 +202,18 @@ model Subject {
   quizzes        Quiz[]
   masteryScores  MasteryScore[]
   studyPlanItems StudyPlanItem[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  studentKyc     StudentKyc[]    @relation("PreferredSubjects")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
 
   @@unique([name, code, grade])
 }
 
 model Chapter {
-  id             String   @id @default(cuid())
+  id             String          @id @default(cuid())
   subjectId      String
-  subject        Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject        Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   name           String
   order          Int
   lessons        Lesson[]
@@ -179,25 +221,27 @@ model Chapter {
   quizzes        Quiz[]
   masteryScores  MasteryScore[]
   studyPlanItems StudyPlanItem[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
 
   @@unique([subjectId, name])
 }
 
 model Lesson {
-  id             String   @id @default(cuid())
+  id             String          @id @default(cuid())
   chapterId      String
-  chapter        Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapter        Chapter         @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   name           String
   order          Int
-  content        String?  // markdown or plain text
+  content        String? // markdown or plain text
   conversations  Conversation[]
   quizzes        Quiz[]
   masteryScores  MasteryScore[]
   studyPlanItems StudyPlanItem[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
 
   @@unique([chapterId, name])
 }
@@ -205,20 +249,21 @@ model Lesson {
 // ---------- Chat / Tutor ----------
 
 model Conversation {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String?
   subjectId String?
-  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subject   Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   chapterId String?
-  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  chapter   Chapter?  @relation(fields: [chapterId], references: [id], onDelete: SetNull)
   lessonId  String?
-  lesson    Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
-  language  Language @default(EN)
+  lesson    Lesson?   @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  language  Language  @default(EN)
   messages  Message[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([userId, updatedAt])
 }
@@ -247,7 +292,7 @@ model Upload {
   type          UploadType
   url           String
   filename      String?
-  mimeType      String?  // e.g. "image/png", "application/pdf"
+  mimeType      String? // e.g. "image/png", "application/pdf"
   size          Int?
   extractedText String?
   quizzes       Quiz[]
@@ -260,23 +305,23 @@ model Upload {
 // ---------- Quizzes ----------
 
 model Quiz {
-  id             String     @id @default(cuid())
-  userId         String?    // null for system/template quizzes
-  user           User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id             String        @id @default(cuid())
+  userId         String? // null for system/template quizzes
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   title          String
   subjectId      String?
-  subject        Subject?   @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  subject        Subject?      @relation(fields: [subjectId], references: [id], onDelete: SetNull)
   chapterId      String?
-  chapter        Chapter?   @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+  chapter        Chapter?      @relation(fields: [chapterId], references: [id], onDelete: SetNull)
   lessonId       String?
-  lesson         Lesson?    @relation(fields: [lessonId], references: [id], onDelete: SetNull)
-  difficulty     Difficulty @default(MEDIUM)
+  lesson         Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  difficulty     Difficulty    @default(MEDIUM)
   sourceUploadId String?
-  sourceUpload   Upload?    @relation(fields: [sourceUploadId], references: [id], onDelete: SetNull)
+  sourceUpload   Upload?       @relation(fields: [sourceUploadId], references: [id], onDelete: SetNull)
   questions      Question[]
   attempts       QuizAttempt[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@index([userId, createdAt])
 }
@@ -287,7 +332,7 @@ model Question {
   quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
   type        QuestionType
   question    String
-  options     Json?        // e.g. [{ id: "A", text: "..." }]
+  options     Json? // e.g. [{ id: "A", text: "..." }]
   answer      String
   explanation String?
   order       Int
@@ -398,7 +443,7 @@ model UsageLog {
   id               String   @id @default(cuid())
   userId           String
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  action           String   // "chat", "quiz", "ocr", etc.
+  action           String // "chat", "quiz", "ocr", etc.
   model            String?
   promptTokens     Int      @default(0)
   completionTokens Int      @default(0)

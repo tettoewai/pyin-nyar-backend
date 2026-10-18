@@ -1,19 +1,22 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsIn, IsNotEmpty } from 'class-validator';
-import type { OtpPurpose } from '../otp.service.js';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEmail, IsIn, IsNotEmpty } from "class-validator";
+import type { OtpPurpose } from "../otp.service.js";
 
 export class RequestOtpDto {
-  @ApiProperty({ description: 'A valid email to request an OTP' })
+  @ApiProperty({
+    description: "A valid email to request an OTP",
+    example: "student@example.com",
+  })
   @IsEmail()
   @IsNotEmpty()
   email!: string;
 
   @ApiProperty({
     description: "OTP purpose 'signup' | 'reset-password'",
-    enum: ['signup', 'reset-password'],
-    default: 'signup',
+    enum: ["signup", "reset-password"],
+    default: "signup",
   })
-  @IsIn(['signup', 'reset-password'])
+  @IsIn(["signup", "reset-password"])
   @IsNotEmpty()
   purpose!: OtpPurpose;
 }
