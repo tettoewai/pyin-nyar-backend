@@ -69,6 +69,7 @@ export class AuthService {
   async signup(
     email: string,
     password: string,
+    userName: string,
     confirmPassword: string,
     otp: string,
     meta: {
@@ -76,6 +77,19 @@ export class AuthService {
       userAgent?: string;
     },
   ) {
+    const normalizedUserName = userName.toLowerCase().trim();
+    const userNameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    if (!normalizedUserName.match(userNameRegex))
+      throw new BadRequestException(
+        "Username must be 3-20 characters and contain only letters, numbers, or underscores.",
+      );
+    const existingUserName = await this.prisma.user.findUnique({
+      where: { userName: normalizedUserName },
+    });
+    if (existingUserName)
+      throw new ConflictException(
+        `The username ${normalizedUserName} is unavailable. Please try another one.`,
+      );
     const normalizedEmail = email.toLowerCase().trim();
     // Check existing user
     const existingUser = await this.prisma.user.findUnique({
@@ -106,6 +120,7 @@ export class AuthService {
       const user = await this.prisma.user.create({
         data: {
           email: normalizedEmail,
+          userName: normalizedUserName,
           passwordHash,
           role: "STUDENT",
         },
@@ -117,7 +132,7 @@ export class AuthService {
         error.code === "P2002"
       ) {
         throw new ConflictException(
-          "Email address has already been registered.",
+          "Email address or username has already been registered.",
         );
       }
       throw error;
@@ -222,11 +237,37 @@ export class AuthService {
     return { message: "Password reset successufully." };
   }
 
+  sanitizeUserName(value: string): string {
+    return (value ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")
+      .slice(0, 20);
+  }
+
+  async availableUserName(base: string): Promise<string> {
+    const name = this.sanitizeUserName(base) || "user";
+    let candidate = name;
+    let suffix = 1;
+    while (
+      await this.prisma.user.findUnique({
+        where: { userName: candidate },
+        select: { id: true },
+      })
+    ) {
+      const s = String(suffix);
+      candidate = `${name.slice(0, 20 - s.length)}${s}`;
+      suffix += 1;
+    }
+    return candidate;
+  }
+
   googleClient = new OAuth2Client();
 
   async googleLogin(
     idToken: string,
     meta: { ip?: string; userAgent?: string },
+    userName?: string,
   ) {
     const ticket = await this.googleClient.verifyIdToken({
       idToken,
@@ -249,6 +290,9 @@ export class AuthService {
         data: {
           email: payload.email,
           googleId: payload.sub,
+          userName: await this.availableUserName(
+            userName ?? email.split("@")[0],
+          ),
           name: payload.name,
           avatarUrl: payload.picture,
         },

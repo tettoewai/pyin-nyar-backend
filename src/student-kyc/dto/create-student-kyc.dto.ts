@@ -69,7 +69,7 @@ export class CreateStudentKycDto {
   guardianPhone!: string;
 
   @ApiProperty({
-    description: "IDs of the subjects the student prefers",
+    description: "Codes of the subjects the student prefers",
     type: [String],
   })
   @IsNotEmpty()

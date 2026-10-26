@@ -11,6 +11,15 @@ export class SignupDto {
   email!: string;
 
   @ApiProperty({
+    description: "Username for the new account",
+    minLength: 3,
+  })
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(3)
+  userName!: string;
+
+  @ApiProperty({
     description: "Password for the new account",
     example: "secret123",
     minLength: 6,

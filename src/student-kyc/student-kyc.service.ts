@@ -25,7 +25,7 @@ export class StudentKycService {
     if (existingKyc) throw new ConflictException("KYC already submitted.");
 
     const subject = await this.prisma.subject.findMany({
-      where: { id: { in: dto.preferredSubjects }, deletedAt: null },
+      where: { code: { in: dto.preferredSubjects }, deletedAt: null },
       select: { id: true },
     });
     if (subject.length !== dto.preferredSubjects.length)
@@ -71,7 +71,7 @@ export class StudentKycService {
   async findMine(userId: string) {
     const kyc = await this.prisma.studentKyc.findFirst({
       where: { userId },
-      include: { preferredSubjects: { select: { id: true, name: true } } },
+      include: { preferredSubjects: { select: { name: true, code: true } } },
     });
     if (!kyc) throw new NotFoundException("KYC not found.");
     return dataOf({
@@ -152,6 +152,11 @@ export class StudentKycService {
               preferredSubjects: { set: subjects.map((s) => ({ id: s.id })) },
             }),
             status: KycStatus.PENDING, // Get back to pending when user update their kyc
+            rejectionNote: null,
+            reviewedAt: null,
+            reviewedBy: {
+              disconnect: true,
+            },
           },
           select: { id: true },
         });

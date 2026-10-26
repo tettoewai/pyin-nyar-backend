@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class GoogleLoginDto {
   @ApiProperty({
@@ -9,4 +9,11 @@ export class GoogleLoginDto {
   @IsString()
   @IsNotEmpty()
   idToken!: string;
+
+  @ApiProperty({
+    description: "Google username obtained from the client",
+  })
+  @IsString()
+  @IsOptional()
+  userName?: string;
 }

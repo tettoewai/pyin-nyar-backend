@@ -16,6 +16,7 @@ async function main() {
     create: {
       email: "admin@pyinnyar.com",
       name: "Admin",
+      userName: "admin",
       passwordHash: adminPassword,
       role: Role.ADMIN,
     },

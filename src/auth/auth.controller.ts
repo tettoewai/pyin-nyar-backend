@@ -51,6 +51,7 @@ export class AuthController {
     return this.authService.signup(
       body.email,
       body.password,
+      body.userName,
       body.confirmPassword,
       body.otp,
       { ip, userAgent: ua },
@@ -89,7 +90,14 @@ export class AuthController {
     @Headers("user-agent") ua: string,
     @Body() body: GoogleLoginDto,
   ) {
-    return this.authService.googleLogin(body.idToken, { ip, userAgent: ua });
+    return this.authService.googleLogin(
+      body.idToken,
+      {
+        ip,
+        userAgent: ua,
+      },
+      body.userName,
+    );
   }
 
   @Post("/refresh")

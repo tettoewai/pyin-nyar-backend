@@ -101,17 +101,19 @@ enum KycStatus {
 // ---------- Users & Profiles ----------
 
 model User {
-  id           String   @id @default(cuid())
-  email        String?  @unique
-  passwordHash String?
-  name         String?
-  googleId     String?  @unique
-  avatarUrl    String?
-  role         Role     @default(STUDENT)
-  language     Language @default(BILINGUAL)
-  grade        Grade?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  email                 String?  @unique
+  passwordHash          String?
+  name                  String?
+  userName              String   @unique
+  usernameChangedAt     DateTime?
+  googleId              String?  @unique
+  avatarUrl             String?
+  role                  Role     @default(STUDENT)
+  language              Language @default(BILINGUAL)
+  grade                 Grade?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   profile       Profile?
   sessions      Session[]
@@ -124,6 +126,7 @@ model User {
   usageLogs     UsageLog[]
   answers       Answer[]
   studentKyc    StudentKyc?
+  kycReviewed   StudentKyc[] @relation("KycReviewedBy")
 }
 
 model Profile {
@@ -153,6 +156,11 @@ model StudentKyc {
   school          String
   region          String
   guardianPhone   String
+
+  rejectionNote   String?             // Why it was rejected from admin
+  reviewedById    String?
+  reviewedBy      User?      @relation("KycReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
 
   preferredSubjects Subject[] @relation("PreferredSubjects")
   status          KycStatus  @default(PENDING)
