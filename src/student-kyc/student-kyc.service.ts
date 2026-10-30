@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { dataOf, success } from "../common/api-response.js";
-import { CryptoService } from "../kyc/crypto.service.js";
+import { CryptoService } from "../common/crypto.service.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { CreateStudentKycDto } from "./dto/create-student-kyc.dto.js";
 import { UpdateStudentKycDto } from "./dto/update-student-kyc.dto.js";

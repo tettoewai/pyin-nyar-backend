@@ -24,7 +24,7 @@ import { TokenService } from "./token.service.js";
     }),
   ],
   providers: [OtpService, AuthService, TokenService],
-  exports: [OtpService],
+  exports: [OtpService, TokenService],
   controllers: [AuthController],
 })
 export class AuthModule {}

@@ -7,7 +7,7 @@ import { dataOf, success } from "../common/api-response.js";
 import { Prisma } from "../generated/prisma/client.js";
 import { Grade, KycStatus } from "../generated/prisma/enums.js";
 import { PrismaService } from "../prisma/prisma.service.js";
-import { CryptoService } from "./crypto.service.js";
+import { CryptoService } from "../common/crypto.service.js";
 
 @Injectable()
 export class KycService {

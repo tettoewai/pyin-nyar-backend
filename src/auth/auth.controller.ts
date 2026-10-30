@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
+import { Public } from "./decorators/public.decorator.js";
 import { AuthService } from "./auth.service.js";
 import { AuthGuard } from "./decorators/auth.guard.js";
 import { CurrentUser } from "./decorators/user.decorator.js";
@@ -22,6 +23,7 @@ import { VerifyResetDto } from "./dto/verify-reset.dto.js";
 import { ConfirmResetDto } from "./dto/confirm-reset.dto.js";
 import { Throttle } from "@nestjs/throttler";
 
+@Public()
 @Controller("auth")
 export class AuthController {
   constructor(

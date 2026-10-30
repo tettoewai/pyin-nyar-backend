@@ -1,19 +1,12 @@
 import { Module } from "@nestjs/common";
-import { StudentKycService } from "./student-kyc.service.js";
+import { AuthModule } from "../auth/auth.module.js";
+import { PrismaModule } from "../prisma/prisma.module.js";
 import { StudentKycController } from "./student-kyc.controller.js";
-import { PrismaService } from "../prisma/prisma.service.js";
-import { CryptoService } from "../kyc/crypto.service.js";
-import { TokenService } from "../auth/token.service.js";
-import { JwtService } from "@nestjs/jwt";
+import { StudentKycService } from "./student-kyc.service.js";
 
 @Module({
   controllers: [StudentKycController],
-  providers: [
-    StudentKycService,
-    PrismaService,
-    CryptoService,
-    TokenService,
-    JwtService,
-  ],
+  providers: [StudentKycService],
+  imports: [PrismaModule, AuthModule],
 })
 export class StudentKycModule {}
