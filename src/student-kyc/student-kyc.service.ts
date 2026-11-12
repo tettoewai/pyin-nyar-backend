@@ -9,7 +9,7 @@ import { CryptoService } from "../common/crypto.service.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { CreateStudentKycDto } from "./dto/create-student-kyc.dto.js";
 import { UpdateStudentKycDto } from "./dto/update-student-kyc.dto.js";
-import { KycStatus } from "../generated/prisma/enums.js";
+import { KycStatus } from "../generated/prisma.bak/enums.js";
 
 @Injectable()
 export class StudentKycService {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service.js";
-import { Grade } from "../generated/prisma/enums.js";
+import { Grade } from "../generated/prisma.bak/enums.js";
 import { dataOf, success } from "../common/api-response.js";
 
 @Injectable()
@@ -18,6 +18,49 @@ export class SubjectService {
     const subjects = await this.prisma.subject.findMany({
       where: { deletedAt: null },
       orderBy: { name: "asc" },
+    });
+    return dataOf(subjects);
+  }
+
+  async findCurriculum(grade?: Grade) {
+    const subjects = await this.prisma.subject.findMany({
+      where: {
+        deletedAt: null,
+        ...(grade !== undefined && { grade }),
+      },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        grade: true,
+        createdAt: true,
+        updatedAt: true,
+        chapters: {
+          where: { deletedAt: null },
+          orderBy: { order: "asc" },
+          select: {
+            id: true,
+            subjectId: true,
+            name: true,
+            order: true,
+            createdAt: true,
+            updatedAt: true,
+            lessons: {
+              where: { deletedAt: null },
+              orderBy: { order: "asc" },
+              select: {
+                id: true,
+                chapterId: true,
+                name: true,
+                order: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        },
+      },
     });
     return dataOf(subjects);
   }
@@ -53,5 +96,22 @@ export class SubjectService {
       data: { deletedAt: new Date() },
     });
     return success("Subject deleted successfully.");
+  }
+
+  async restore(id: string) {
+    const existingSubject = await this.prisma.subject.findUnique({
+      where: { id, deletedAt: { not: null } },
+      select: { id: true },
+    });
+    if (!existingSubject)
+      throw new NotFoundException("Subject not found to restore!");
+
+    await this.prisma.subject.update({
+      where: { id },
+      data: {
+        deletedAt: null,
+      },
+    });
+    return success("Subject restored successfully.");
   }
 }

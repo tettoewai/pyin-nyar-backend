@@ -1,0 +1,1625 @@
+{
+  "info": {
+    "_postman_id": "680d9a32-aa9f-488f-b338-e487f20bd445",
+    "name": "Pyin Nyar",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32780523",
+    "_collection_link": "https://go.postman.co/collection/32780523-680d9a32-aa9f-488f-b338-e487f20bd445?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "pm.environment.set(\"accessToken\", responseJson.accessToken);",
+                  "pm.environment.set(\"refreshToken\", responseJson.refreshToken);",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@pyinnyar.com\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "request-otp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tettoewai690@gmail.com\",\n  \"purpose\": \"signup\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "request"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "request-reset-otp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "request"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tettoewai690@gmail.com\",\n  \"purpose\": \"reset-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "sign-up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tettoewai690@gmail.com\",\n  \"password\": \"tettoewai@1\",\n  \"confirmPassword\": \"tettoewai@1\",\n  \"userName\": \"tettoewai\",\n  \"otp\": \"029392\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/sign-up",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "sign-up"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "pm.environment.set(\"accessToken\", responseJson.accessToken);",
+                  "pm.environment.set(\"refreshToken\", responseJson.refreshToken);",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "google",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/google",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "google"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"{{googleIdToken}}\",\n  \"userName\": \"tettoewai\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "pm.environment.set(\"accessToken\", responseJson.accessToken);",
+                  "pm.environment.set(\"refreshToken\", responseJson.refreshToken);",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "pm.environment.set(\"accessToken\", responseJson.accessToken);",
+                  "pm.environment.set(\"refreshToken\", responseJson.refreshToken);",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logout-all",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout-all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "verify-reset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"tettoewai690@gmail.com\",\n  \"otp\": \"427918\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password",
+                "verify"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.resetToken) pm.environment.set(\"resetToken\", responseJson.resetToken);",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "confirm-reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resetToken\": \"{{resetToken}}\",\n  \"password\": \"tettoewai@2\",\n  \"confirmPassword\": \"tettoewai@2\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password",
+                "confirm"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "admin",
+      "item": [
+        {
+          "name": "subject",
+          "item": [
+            {
+              "name": "get-subject",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/subject",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "subject"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "create-subject",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Biology\",\n  \"code\": \"BIO12\",\n  \"grade\": \"GRADE_12\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/subject",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "subject"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update-subject",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Chemistry\",\n  \"code\": \"CHEM12\",\n  \"grade\": \"GRADE_12\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/subject/cmvxsxlor0003holxrrnyi35d",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "subject",
+                    "cmvxsxlor0003holxrrnyi35d"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete-subject",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/subject/cmvxsxlor0003holxrrnyi35d",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "subject",
+                    "cmvxsxlor0003holxrrnyi35d"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "restore-subject",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/subject/cmvxsxlor0003holxrrnyi35d/restore",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "subject",
+                    "cmvxsxlor0003holxrrnyi35d",
+                    "restore"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "chapter",
+          "item": [
+            {
+              "name": "get-chapters",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/chapter",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "chapter"
+                  ],
+                  "query": [
+                    {
+                      "key": "subjectId",
+                      "value": "cmvxsxcy70002holxu5ui6bhf",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "create-chapter",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"subjectId\": \"cmvxsxcy70002holxu5ui6bhf\",\n  \"name\": \"Analytical Solid Geometry\",\n  \"order\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/chapter",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "chapter"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get-chapter",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/chapter/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "chapter",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmwbfsnjt000083lx74dzmw4t"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update-chapter",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"subjectId\": \"cmvxsxcy70002holxu5ui6bhf\",\n  \"name\": \"Complex Numbers\",\n  \"order\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/chapter/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "chapter",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmwbfsnjt000083lx74dzmw4t"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "move-chapter",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"subjectId\": \"cmvxsxcy70002holxu5ui6bhf\",\n  \"id\": \"cmwbfsnjt000083lx74dzmw4t\",\n  \"beforeId\": \"cmwbfvhr7000183lxlyurek4x\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/chapter/move",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "chapter",
+                    "move"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete-chapter",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/chapter/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "chapter",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmwbfsnjt000083lx74dzmw4t"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "restore-chapter",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/chapter/restore/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "chapter",
+                    "restore",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmwbfsnjt000083lx74dzmw4t"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "lesson",
+          "item": [
+            {
+              "name": "get-lessons",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/lesson",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "lesson"
+                  ],
+                  "query": [
+                    {
+                      "key": "chapterId",
+                      "value": "cmwbfsnjt000083lx74dzmw4t",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "create-lesson",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chapterId\": \"cmwbfsnjt000083lx74dzmw4t\",\n  \"name\": \"1.1 Pure Imaginary Unit $i$\",\n  \"order\": 0,\n  \"content\": \"Since we have known that $x^2 \\\\geq 0$ for every real number $x$, the equation $x^2 = -4$ has no real solution. But if there is a **pure imaginary unit** $i$ such that\\n\\n$$i^2 = -1$$\\n\\nwith acceptance of the usual operations...\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/lesson",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "lesson"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get-lesson",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/lesson/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "lesson",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmwcccw2k00036alxe0ljmmtd"
+                    }
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update-lesson",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chapterId\": \"cmwbfsnjt000083lx74dzmw4t\",\n  \"name\": \"1.1 Pure Imaginary Unit $i$\",\n  \"order\": 0,\n  \"content\": \"Since we have known that $x^2 \\\\geq 0$ for every real number $x$, the equation $x^2 = -4$ has no real solution. But if there is a **pure imaginary unit** $i$ such that\\n\\n$$i^2 = -1$$\\n\\nwith acceptance of the usual operations on real numbers and $i$ such as\\n\\n$$(2i)^2 = 4i^2 = 4(-1) = -4 \\\\quad \\\\text{and} \\\\quad (-2i)^2 = 4i^2 = 4(-1) = -4$$\\n\\nthen $x^2 = -4$ has two solutions $2i$ and $-2i$.\\n\\nIf we try to solve $x^2 = -n$, for $n > 0$, like $x^2 = -4$, then $\\\\sqrt{n}i$ and $-\\\\sqrt{n}i$ are solutions because\\n\\n$$(\\\\pm\\\\sqrt{n}i)^2 = ni^2 = n(-1) = -n$$\\n\\n### Worked example 1\\n\\n**Example.** Solve $x^2 + 2x + 5 = 0$.\\n\\n**Solution.**\\n\\n$$x^2 + 2x + 5 = 0$$\\n\\n$$x^2 + 2x + 1 = -4$$\\n\\n$$(x + 1)^2 = -4$$\\n\\n$$x + 1 = \\\\pm\\\\sqrt{4}i$$\\n\\n$$x = -1 \\\\pm 2i$$\\n\\nSo there are two solutions $x = -1 + 2i$ and $x = -1 - 2i$.\\n\\n### Worked example 2\\n\\n**Example.** Solve $x^2 + 2x + 3 = 0$ and check your answers.\\n\\n**Solution.**\\n\\n$$x^2 + 2x + 3 = 0$$\\n\\n$$x^2 + 2x + 1 = -2$$\\n\\n$$(x + 1)^2 = -2$$\\n\\n$$x + 1 = \\\\pm \\\\sqrt{2}i$$\\n\\n$$x = -1 \\\\pm \\\\sqrt{2}i$$\\n\\nSo two solutions are $x = -1 + \\\\sqrt{2}i$ and $x = -1 - \\\\sqrt{2}i$.\\n\\nFor $x = -1 + \\\\sqrt{2}i$,\\n\\n$$\\\\begin{aligned} x^2 + 2x + 3 &= (-1 + \\\\sqrt{2}i)^2 + 2(-1 + \\\\sqrt{2}i) + 3 \\\\\\\\ &= 1 - 2\\\\sqrt{2}i + 2i^2 - 2 + 2\\\\sqrt{2}i + 3 \\\\\\\\ &= 1 - 2\\\\sqrt{2}i - 2 - 2 + 2\\\\sqrt{2}i + 3 \\\\\\\\ &= 0 \\\\end{aligned}$$\\n\\nFor $x = -1 - \\\\sqrt{2}i$,\\n\\n$$\\\\begin{aligned} x^2 + 2x + 3 &= (-1 - \\\\sqrt{2}i)^2 + 2(-1 - \\\\sqrt{2}i) + 3 \\\\\\\\ &= 1 + 2\\\\sqrt{2}i + 2i^2 - 2 - 2\\\\sqrt{2}i + 3 \\\\\\\\ &= 1 + 2\\\\sqrt{2}i - 2 - 2 - 2\\\\sqrt{2}i + 3 \\\\\\\\ &= 0 \\\\end{aligned}$$\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/lesson/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "lesson",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmwcccw2k00036alxe0ljmmtd"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "reorder-lessons",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/lesson/reorder",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "lesson",
+                    "reorder"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chapterId\": \"cmwbfsnjt000083lx74dzmw4t\",\n  \"ids\": [\n    \"cmwcccw2k00036alxe0ljmmtd\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete-lesson",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/lesson/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "lesson",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmwcccw2k00036alxe0ljmmtd"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "kyc",
+          "item": [
+            {
+              "name": "get-all-kyc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/kyc",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "kyc"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "Tet",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "PENDING",
+                      "disabled": true
+                    },
+                    {
+                      "key": "grade",
+                      "value": "GRADE_12",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get-kyc",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/kyc/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "kyc",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmvpktqcd00085glx4wy6jea9"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update-kyc-status",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"REJECTED\",\n  \"note\": \"blah blah blah\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/kyc/:id/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "kyc",
+                    ":id",
+                    "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "cmvpktqcd00085glx4wy6jea9"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "subject",
+      "item": [
+        {
+          "name": "get-subjects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subject"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-curriculum",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/curriculum",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "curriculum"
+              ],
+              "query": [
+                {
+                  "key": "grade",
+                  "value": "GRADE_12",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-subject-chapters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subject/:subjectId/chapter",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subject",
+                ":subjectId",
+                "chapter"
+              ],
+              "variable": [
+                {
+                  "key": "subjectId",
+                  "value": "cmvxsxcy70002holxu5ui6bhf"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-chapter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chapter/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chapter",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cmwbfsnjt000083lx74dzmw4t"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-chapter-lessons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chapter/:chapterId/lesson",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chapter",
+                ":chapterId",
+                "lesson"
+              ],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "cmwbfsnjt000083lx74dzmw4t"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get-lesson",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/lesson/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lesson",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cmwcccw2k00036alxe0ljmmtd"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "student-kyc",
+      "item": [
+        {
+          "name": "submit-kyc",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grade\": \"GRADE_12\",\n  \"name\": \"Tet Toe Wai\",\n  \"dateOfBirth\": \"2008-04-12\",\n  \"gender\": \"MALE\",\n  \"docType\": \"STUDENT_CARD\",\n  \"docNumber\": \"STU-2024-009821\",\n  \"school\": \"Yangon No.2 Basic Education High School\",\n  \"region\": \"Yangon\",\n  \"guardianPhone\": \"+959771234567\",\n  \"preferredSubjects\": [\n    \"Mathematics\",\n    \"Physics\",\n    \"Chemistry\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/student-kyc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "student-kyc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/student-kyc/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "student-kyc",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update-me",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/student-kyc/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "student-kyc",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"school\": \"Yangon No.2 Basic Education High School\",\n  \"region\": \"Yangon\",\n  \"guardianPhone\": \"+959771234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "profile",
+      "item": [
+        {
+          "name": "get-profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "health-check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "googleIdToken",
+      "value": ""
+    }
+  ]
+}

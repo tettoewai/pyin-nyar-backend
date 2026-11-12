@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Language } from "../../generated/prisma/enums.js";
+import { Language } from "../../generated/prisma.bak/enums.js";
 
 export class CreateConversationDto {
   @ApiProperty({

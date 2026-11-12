@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Difficulty } from "../../generated/prisma/enums.js";
+import { Difficulty } from "../../generated/prisma.bak/enums.js";
 
 export class CreateQuizDto {
   @ApiProperty({

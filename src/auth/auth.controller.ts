@@ -23,7 +23,6 @@ import { VerifyResetDto } from "./dto/verify-reset.dto.js";
 import { ConfirmResetDto } from "./dto/confirm-reset.dto.js";
 import { Throttle } from "@nestjs/throttler";
 
-@Public()
 @Controller("auth")
 export class AuthController {
   constructor(
@@ -38,12 +37,14 @@ export class AuthController {
     return this.authService.me(user.sub);
   }
 
+  @Public()
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post("/otp/request")
   requestOtp(@Body() body: RequestOtpDto) {
     return this.otpService.requestOtp(body.email, body.purpose);
   }
 
+  @Public()
   @Post("/sign-up")
   signUp(
     @Ip() ip: string,
@@ -60,6 +61,7 @@ export class AuthController {
     );
   }
 
+  @Public()
   @Post("/login")
   login(
     @Ip() ip: string,
@@ -72,11 +74,13 @@ export class AuthController {
     });
   }
 
+  @Public()
   @Post("/reset-password/verify")
   verifyReset(@Body() body: VerifyResetDto) {
     return this.authService.verifyResetOtp(body.email, body.otp);
   }
 
+  @Public()
   @Post("/reset-password/confirm")
   confirmReset(@Body() body: ConfirmResetDto) {
     return this.authService.confirmResetPassword(
@@ -86,6 +90,7 @@ export class AuthController {
     );
   }
 
+  @Public()
   @Post("/google")
   google(
     @Ip() ip: string,
@@ -102,6 +107,7 @@ export class AuthController {
     );
   }
 
+  @Public()
   @Post("/refresh")
   refresh(
     @Ip() ip: string,
@@ -114,6 +120,7 @@ export class AuthController {
     });
   }
 
+  @Public()
   @Post("/logout")
   logout(@Body() body: RefreshDto) {
     return this.tokenService.revoke(body.refreshToken);

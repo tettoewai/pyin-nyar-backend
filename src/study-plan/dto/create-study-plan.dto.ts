@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsString,
 } from "class-validator";
-import { StudyPlanStatus } from "../../generated/prisma/enums.js";
+import { StudyPlanStatus } from "../../generated/prisma.bak/enums.js";
 
 export class CreateStudyPlanDto {
   @ApiProperty({ description: "The ID of the user who owns the plan" })

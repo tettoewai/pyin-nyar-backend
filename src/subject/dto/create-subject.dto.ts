@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { Grade } from "../../generated/prisma/enums.js";
+import { Grade } from "../../generated/prisma.bak/enums.js";
 
 export class CreateSubjectDto {
   @ApiProperty({ description: "The subject name", example: "Physics" })

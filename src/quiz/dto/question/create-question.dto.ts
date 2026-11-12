@@ -8,7 +8,7 @@ import {
   IsString,
   Min,
 } from "class-validator";
-import { QuestionType } from "../../../generated/prisma/enums.js";
+import { QuestionType } from "../../../generated/prisma.bak/enums.js";
 
 export class CreateQuestionDto {
   @ApiProperty({ description: "The ID of the quiz this question belongs to" })

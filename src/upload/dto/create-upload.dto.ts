@@ -7,7 +7,7 @@ import {
   IsString,
   Min,
 } from "class-validator";
-import { UploadType } from "../../generated/prisma/enums.js";
+import { UploadType } from "../../generated/prisma.bak/enums.js";
 
 export class CreateUploadDto {
   @ApiProperty({ description: "The ID of the user who owns the upload" })

@@ -7,7 +7,7 @@ import {
   IsString,
   Min,
 } from "class-validator";
-import { AttemptStatus } from "../../../generated/prisma/enums.js";
+import { AttemptStatus } from "../../../generated/prisma.bak/enums.js";
 
 export class CreateQuizAttemptDto {
   @ApiProperty({ description: "The ID of the user taking the quiz" })

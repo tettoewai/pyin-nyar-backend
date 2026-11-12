@@ -46,4 +46,11 @@ export class SubjectAdminController {
   delete(@Param("id") id: string) {
     return this.subjectService.delete(id);
   }
+
+  @Patch(":id/restore")
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  restore(@Param("id") id: string) {
+    return this.subjectService.restore(id);
+  }
 }

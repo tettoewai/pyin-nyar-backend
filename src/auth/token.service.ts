@@ -1,9 +1,9 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { createHash, randomUUID } from 'node:crypto';
-import { Role } from '../generated/prisma/enums.js';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { createHash, randomUUID } from "node:crypto";
+import { Role } from "../generated/prisma.bak/enums.js";
+import { PrismaService } from "../prisma/prisma.service.js";
+import { ConfigService } from "@nestjs/config";
 
 // What goes inside the JWTs
 export interface AccessPayload {
@@ -24,7 +24,7 @@ export interface TokenPair {
 }
 
 export function sha256(value: string): string {
-  return createHash('sha256').update(value).digest('hex');
+  return createHash("sha256").update(value).digest("hex");
 }
 
 @Injectable()
@@ -41,14 +41,14 @@ export class TokenService {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
   ) {
-    this.accessSecret = this.config.getOrThrow<string>('JWT_ACCESS_SECRET');
-    this.refreshSecret = this.config.getOrThrow<string>('JWT_REFRESH_SECRET');
+    this.accessSecret = this.config.getOrThrow<string>("JWT_ACCESS_SECRET");
+    this.refreshSecret = this.config.getOrThrow<string>("JWT_REFRESH_SECRET");
     this.accessTtlSec = parseInt(
-      this.config.getOrThrow<string>('JWT_ACCESS_TTL'),
+      this.config.getOrThrow<string>("JWT_ACCESS_TTL"),
       10,
     );
     this.refreshTtlSec = parseInt(
-      this.config.getOrThrow('JWT_REFRESH_TTL'),
+      this.config.getOrThrow("JWT_REFRESH_TTL"),
       10,
     );
   }
@@ -98,11 +98,11 @@ export class TokenService {
     try {
       return await this.jwt.verifyAsync<AccessPayload>(token, {
         secret: this.accessSecret,
-        issuer: 'pyin-nyar',
+        issuer: "pyin-nyar",
       });
     } catch (error: any) {
       this.logger.error(`[verifyToken] error: ${error}`);
-      throw new UnauthorizedException('Invalid or expired access token.');
+      throw new UnauthorizedException("Invalid or expired access token.");
     }
   }
 
@@ -118,7 +118,7 @@ export class TokenService {
       });
     } catch (error: any) {
       this.logger.error(`[refreshToken] error: ${error}`);
-      throw new UnauthorizedException('Invalid or expired refresh token.');
+      throw new UnauthorizedException("Invalid or expired refresh token.");
     }
 
     // 2. Must have an active session row
@@ -127,14 +127,14 @@ export class TokenService {
       where: { tokenHash },
     });
     if (!session) {
-      throw new UnauthorizedException('Invalid or expired refresh token.');
+      throw new UnauthorizedException("Invalid or expired refresh token.");
     }
 
     // 3. Reuse detection: token was already rotated/logged-out but JWT still valid
     // Means the secret leaked and two devices user it -> kill all session
     if (session.revokedAt) {
       await this.revokeAll(payload.sub);
-      throw new UnauthorizedException('Refresh toke reused.');
+      throw new UnauthorizedException("Refresh toke reused.");
     }
 
     // 4. Rotate atomically: revoke old, create new row is done inside issue()
@@ -149,7 +149,7 @@ export class TokenService {
         data: { revokedAt: new Date() },
       });
       if (revoked.count === 0) {
-        throw new UnauthorizedException('Refresh toke reused.');
+        throw new UnauthorizedException("Refresh toke reused.");
       }
 
       const jti = randomUUID();
