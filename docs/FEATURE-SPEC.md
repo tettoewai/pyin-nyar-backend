@@ -186,6 +186,10 @@ practice.
 **Question types** - Multiple choice. - True / false. - Fill in the
 blank. - Short answer. - Matching. - Step-by-step problem solving.
 
+> **MVP scope:** multiple choice, true/false and fill-in-the-blank only.
+> Short answer, matching and step-by-step are v1.1. See
+> [`PLAN.md` §3.3](./PLAN.md#33-mvp-definition-minimum-shippable-loop).
+
 **Configuration** - Subject and topic. - Number of questions. -
 Difficulty. - Question type. - Source: selected lesson, uploaded
 document, or general topic.
@@ -450,6 +454,12 @@ Pyin Nyar should support learning rather than encourage copying.
 
 The MVP should prove that students can learn more effectively with Pyin
 Nyar. It should not attempt to launch every feature at once.
+
+> **Scope resolution.** The list below is the full MVP ambition. The cut that
+> actually ships is defined in [`PLAN.md` §3.3](./PLAN.md#33-mvp-definition-minimum-shippable-loop),
+> which fixes three subjects, no admin application, no gamification and no
+> study plans, and closes the differences recorded in its Appendix E.6. Where
+> the two documents disagree on MVP scope, `PLAN.md` §3.3 is authoritative.
 
 ### Must have
 

@@ -1,6 +1,6 @@
 # Pyin Nyar — Production Plan
 
-**Status:** Draft v1.2 · **Created:** 2026-10-30 · **Revised:** 2026-11-15 (Phase 0 defects D1–D4, D7, D12–D13 closed) · **Owner:** TBD
+**Status:** Draft v1.3 · **Created:** 2026-10-30 · **Revised:** 2026-11-15 (Phase 0 defects closed; MVP scope defined in §3.3) · **Owner:** TBD
 **Scope:** Three codebases (`pyin-nyar/` mobile, `pyin-nyar-backend/`, `pyin-nyar-admin/`) from the current commit state to a public store launch and a stable post-launch operating mode.
 
 **How to use this document**
@@ -57,6 +57,8 @@ The product thesis is correct and the data model was built for it. What exists t
 **New input (2026-10-30):** five Grade 12 textbook bundles are now in the workspace root (`curriculum/`) — full markdown transcripts, a TOC/page map, and extracted page images for Myanmar, English, Maths, Physics, and Chemistry. Three are substantially complete (Myanmar, English, Maths); Physics is **table-of-contents only**; Chemistry is **partial (pp. 20–40)**. This removes the "author the curriculum outline" work and gives the AI real grounding material, but it adds a content ingestion/QA pipeline and makes the **licensing question urgent** (the books carry a Ministry copyright notice). See [§2.5](#25-curriculum-corpus-added-2026-10-30) for the inventory and [§9](#9-phase-1--curriculum-ingestion--onboarding) for the revised phase.
 
 **Timeline (solo, full-time):** 20 weeks to public launch, 22 with contingency. Two developers plus a content editor: 12–14 weeks. Part-time solo: 30–34 weeks. Start date assumed **2026-11-02**, so target launch **2027-03-22**, with a two-week buffer. This is **later than the March matric exam window**; if that window is a hard requirement, use the reduced "exam sprint" scope in [§25](#25-timeline--milestones) instead of the full launch set.
+
+**MVP (recommended default):** a ~70 developer-day cut of this plan — three subjects, no admin app, no gamification, no study plans — defined in [§3.3](#33-mvp-definition-minimum-shippable-loop). The full plan remains the v1 target; MVP is what ships first.
 
 **The three things most likely to sink the launch** (details in [§27](#27-risks--mitigations)):
 
@@ -211,6 +213,68 @@ Production means **a student in Myanmar can install the app from a store, sign u
 ### 3.2 Explicit non-goals for v1
 
 Voice tutor, dedicated English tutor mode, parent dashboard, teacher/classroom, PDF course generation, mind maps, audio lessons, payments/subscriptions, web app, offline lesson packs, multi-language UI beyond Burmese/English, push notifications beyond streaks (v1.1). **Also out of v1 scope:** Grade 10 and Grade 11 content, Biology (absent from the corpus), and verbatim redistribution of textbook text without written permission.
+
+### 3.3 MVP definition (minimum shippable loop)
+
+§3.1 and §3.2 describe **v1 production**: the full loop for five subjects with an admin app and hardening. **MVP is the default shipping track** — the smallest release that proves the loop in §3 with real content, on a store-installable build, at a cost that survives measurement. Anything not marked in-scope below is v1.1 or later. Where this section and §3.1 disagree, this section wins for MVP.
+
+**MVP in one sentence:** a Grade 12 student installs the app, onboards, opens a lesson from one of three subjects, gets a streamed lesson-grounded explanation, works through a Teach Me session, photographs an exercise and gets a hint-first walkthrough, takes a generated quiz, sees mastery move, and can delete their account.
+
+| Area            | MVP                                                                                           | Deferred to v1.1+                                                                |
+| --------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Content         | Myanmar, English, Mathematics (licence permitting)                                            | Physics and Chemistry bodies ([§20](#20-post-v1-roadmap)); Grades 10–11; Biology |
+| Curriculum      | `import-gms` CLI + idempotent seed; published-only reads; markdown, image and LaTeX rendering | Admin curriculum authoring UI (Phase 8)                                          |
+| Tutor           | Chat with SSE streaming, lesson scope, quotas, feedback and report, simplify                  | Translate, dedicated English mode, voice                                         |
+| Guided learning | Teach Me state machine (Socratic + step-by-step)                                              | Revision style                                                                   |
+| Homework        | Photo → OCR → hint ladder; **pasted text** accepted                                           | PDF ingestion (§20 v1.2)                                                         |
+| Quizzes         | MCQ, TRUE_FALSE, FILL_BLANK; server grading; explanations; attempt history                    | SHORT_ANSWER rubric grading, matching, step-by-step, daily practice              |
+| Progress        | Mastery tree, weakness list, lesson-completion events                                         | Study plans, streaks, XP, badges, achievements (Phase 7)                         |
+| Admin           | **None.** Content via the import CLI; KYC optional per D-KYC; support via audited DB access   | Full admin app: KYC queue, coverage dashboard, AI ops (Phase 8)                  |
+| Mobile          | Real data everywhere, loading/empty/error/offline states, TestFlight + Play internal builds   | Full accessibility and performance budget, deep links beyond lesson/tutor        |
+| Hardening       | Privacy policy, terms, AI disclosure, account deletion, rate limits, managed secrets, backups | Pen test, ASVS L1 review, staged rollout, load test                              |
+| Metrics         | Product funnel, attempts, accuracy, mastery movement                                          | Learning-outcome metrics (§13)                                                   |
+
+**Scope by phase** (day estimates are the MVP subset of each phase, not additions):
+
+| Phase                       | Full plan              | MVP                    | What is cut                                                                                                    |
+| --------------------------- | ---------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 0 — Foundations             | 10 d                   | **4 d**                | Only D5/D6, D8 (prefix, body limit, trust proxy), D9, e2e harness and CI remain; D1–D4, D7, D12–D13 are closed |
+| 1 — Curriculum + onboarding | 12 d                   | **9 d**                | Physics/Chemistry authoring; three subjects only                                                               |
+| 2 — Tutor + Teach Me        | 15 d                   | **13 d**               | `translate`                                                                                                    |
+| 3 — Upload + OCR + homework | 10 d                   | **8 d**                | PDF; pasted text only                                                                                          |
+| 4 — Quizzes + grading       | 12 d                   | **10 d**               | Short-answer grading, daily practice                                                                           |
+| 5 — Mastery                 | 12 d                   | **5 d**                | Study plans; mastery tree and weaknesses only                                                                  |
+| 6 — Mobile integration      | 10 d                   | **8 d**                | Full a11y/perf budget                                                                                          |
+| 7 — Gamification            | 6 d                    | **0**                  | Whole phase                                                                                                    |
+| 8 — Admin app               | 12 d                   | **0**                  | Whole phase; CLI + direct DB instead                                                                           |
+| 9 — Hardening               | 12 d                   | **6 d**                | Pen test, ASVS review, load test                                                                               |
+| 10 — Staging/launch         | 14 d                   | **7 d**                | Staged rollout, launch comms                                                                                   |
+| **Total**                   | ~20-week critical path | **≈70 developer-days** | ~14 weeks solo; ~9–10 weeks with two developers plus a content editor                                          |
+
+Store review and the beta soak are calendar time that scope cuts cannot compress: expect roughly **4 weeks** after the last engineering day before a public listing.
+
+**MVP exit criteria**
+
+1. One scripted device run end to end: onboarding → lesson → tutor → Teach Me → photo homework → quiz → mastery movement, all on real ingested content.
+2. Closed beta of 20–50 Grade 12 students on TestFlight + Play internal for two weeks, crash-free sessions ≥ 99.5%.
+3. Blended AI cost ≤ $0.015 per active student-day; quotas enforced and remaining usage visible before the limit is hit.
+4. Licence recorded for the three shipped subjects; no `REFERENCE_ONLY` passage served verbatim (verified by a serialisation test).
+5. Privacy policy, terms, AI disclosure, and a working account-deletion path (rows and objects gone).
+6. CI green on lint, typecheck, unit and e2e; one rollback rehearsed.
+
+**Decisions taken for MVP** (these close the spec ↔ plan gaps listed in [§E.5](#e5-known-spec--plan-gaps)):
+
+| Gap                     | Decision                                                                                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PDF / text materials    | MVP ships **pasted text** through the Phase 3 extracted-text path; PDF stays v1.2. The spec's "basic PDF/text support" is met by text.                          |
+| Flashcards, saved notes | v1.1/v1.2 per §20; not in MVP.                                                                                                                                  |
+| Burmese-first UI        | MVP adds a minimal UI string catalogue (Burmese default, English toggle) for onboarding and navigation, task 1.21 below; copy review of lesson content is v1.1. |
+| Question types          | MVP = MCQ, TRUE_FALSE, FILL_BLANK. SHORT_ANSWER, matching and step-by-step are v1.1; §4.5 of the spec is annotated to match.                                    |
+| Learning metrics        | MVP instruments the funnel plus attempts/accuracy/mastery movement; "improvement between assessments" needs a mastery baseline and is v1.1.                     |
+
+**Added MVP task — 1.21 UI string catalogue.** Extract onboarding and navigation copy into a single Burmese/English catalogue with a device-language default and an explicit toggle; no other screen is localised in MVP. Acceptance: switching language changes navigation and onboarding labels without restarting the app, and no screen shows a raw key.
+
+**MVP's dominant risk:** if `D-CURRICULUM` resolves to `REFERENCE_ONLY`, all three subject bodies must be rewritten before Phase 1 can publish. That is content work (roughly 10–15 days, parallelisable to a writer), not engineering, and it sits on the critical path. If it slips, ship Mathematics + English first rather than delaying the engineering track.
 
 ---
 
@@ -1598,6 +1662,23 @@ Assumes **solo, full-time, 5 days/week**, start **2026-11-02**. Content work (in
 | M8  | 2027-03-19 | Release candidate approved; staged rollout starts                              |
 | M9  | 2027-03-22 | Public launch                                                                  |
 
+**MVP track (default).** [§3.3](#33-mvp-definition-minimum-shippable-loop) is this schedule minus Phases 7 and 8, minus study plans, minus Physics/Chemistry content: ~70 developer-days. Week numbers below are relative to the first MVP engineering week.
+
+| Weeks | MVP milestone                                                           |
+| ----- | ----------------------------------------------------------------------- |
+| 1     | Phase 0 exit: D5/D6, D8, D9, e2e harness, CI                            |
+| 2–3   | Three subjects ingested; onboarding and lesson renderer live in staging |
+| 4–6   | Streaming tutor + Teach Me demoable on device                           |
+| 7–8   | Photo homework (OCR → hint ladder)                                      |
+| 9–10  | Quiz generation, attempts, grading, history                             |
+| 11    | Mastery tree + weakness list                                            |
+| 12    | Mobile integration: every screen on real data, all states               |
+| 13    | Hardening subset: deletion, policy, secrets, rate limits, backups       |
+| 14    | Beta build with 20–50 testers                                           |
+| 15–17 | Beta soak, store submission, review, public listing                     |
+
+The engineering track is shorter than the calendar suggests: store review and the beta soak are fixed costs, so MVP buys **scope and cost reduction** more than it buys calendar time — roughly four weeks earlier than the full track, not twelve.
+
 **Exam sprint (only if the March matric window is a hard requirement).** A 12-week reduction that ships before the exam, at reduced scope:
 
 - Launch **Myanmar, English, Mathematics** only; Physics and Chemistry show "coming soon".
@@ -1882,3 +1963,17 @@ These are disagreements between the two documents, not implementation bugs. Clos
 3. **Burmese-first navigation (§5.1) has no owner task.** The plan localises content language and Burmese glyph rendering (task 1.15) but never localises UI strings. Add a locale-catalogue task to Phase 1 or Phase 6.
 4. **Question types differ.** §4.5 lists matching and step-by-step problem solving; §12 task 4.2 implements MCQ, TRUE_FALSE, FILL_BLANK, SHORT_ANSWER. Record the four supported types in the spec or extend Phase 4.
 5. **Learning-value metrics (§13) are not instrumented.** §22 covers latency, errors and cost, but not "improvement between initial and later assessments" or "repeat practice on weak topics". Add them to the Phase 5 analytics work.
+
+### E.6 MVP cut decisions
+
+Scope for the first release is fixed by [§3.3](#33-mvp-definition-minimum-shippable-loop); this table records how each E.5 gap was closed so neither document drifts.
+
+| E.5 gap                    | Resolution                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------------- |
+| 1. PDF/text support        | MVP ships pasted text; PDF ingestion is v1.2. The spec's must-have is satisfied by text.          |
+| 2. Flashcards, saved notes | v1.1/v1.2 per §20; explicitly not MVP.                                                            |
+| 3. Burmese-first UI        | MVP task 1.21 adds a Burmese/English string catalogue for onboarding and navigation only.         |
+| 4. Question types          | MVP = MCQ, TRUE_FALSE, FILL_BLANK; spec §4.5 annotated accordingly.                               |
+| 5. Learning metrics        | Funnel + attempts/accuracy/mastery movement in MVP; assessment-to-assessment improvement is v1.1. |
+
+MVP excludes, by decision: Physics and Chemistry bodies, study plans, gamification, the admin application, PDF ingestion, short-answer and matching question types, translate, daily practice, staged rollout, and a pen test. Each is scheduled in [§20](#20-post-v1-roadmap) or its phase and must not be pulled into MVP without removing something of equal size ([Appendix C](#appendix-c--working-agreements)).
