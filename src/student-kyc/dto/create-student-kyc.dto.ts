@@ -7,7 +7,7 @@ import {
   IsString,
   MinLength,
 } from "class-validator";
-import { Gender, Grade, KycDocType } from "../../generated/prisma.bak/enums.js";
+import { Gender, Grade, KycDocType } from "@/generated/prisma/enums.js";
 
 export class CreateStudentKycDto {
   @ApiProperty({ enum: Grade, description: "The student's current grade" })
@@ -69,11 +69,11 @@ export class CreateStudentKycDto {
   guardianPhone!: string;
 
   @ApiProperty({
-    description: "Codes of the subjects the student prefers",
+    description: "IDs of the subjects the student prefers",
     type: [String],
   })
   @IsNotEmpty()
   @IsArray()
   @IsString({ each: true })
-  preferredSubjects!: string[];
+  preferredSubjectIds!: string[];
 }

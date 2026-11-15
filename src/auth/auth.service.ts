@@ -10,10 +10,10 @@ import { JwtService } from "@nestjs/jwt";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import * as argon2 from "argon2";
 import { OAuth2Client } from "google-auth-library";
-import { PrismaService } from "../prisma/prisma.service.js";
-import { dataOf } from "../common/api-response.js";
-import { OtpService } from "./otp.service.js";
-import { TokenService } from "./token.service.js";
+import { PrismaService } from "@/prisma/prisma.service.js";
+import { dataOf } from "@/common/api-response.js";
+import { OtpService } from "@/auth/otp.service.js";
+import { TokenService } from "@/auth/token.service.js";
 
 @Injectable()
 export class AuthService {
@@ -123,6 +123,8 @@ export class AuthService {
           userName: normalizedUserName,
           passwordHash,
           role: "STUDENT",
+          // Every account owns exactly one Profile row.
+          profile: { create: {} },
         },
       });
       return this.tokenService.issue(user.id, user.email, user.role, meta);
@@ -295,6 +297,7 @@ export class AuthService {
           ),
           name: payload.name,
           avatarUrl: payload.picture,
+          profile: { create: {} },
         },
       });
     } else {
@@ -304,6 +307,8 @@ export class AuthService {
           googleId: payload.sub,
           name: user.name ?? payload.name,
           avatarUrl: user.avatarUrl ?? payload.picture,
+          // Accounts that predate Profile rows get one on their next login.
+          profile: { upsert: { create: {}, update: {} } },
         },
       });
     }

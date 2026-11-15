@@ -1,6 +1,12 @@
-import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+  ForbiddenException,
+} from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { AccessPayload } from "../token.service.js";
+import { AccessPayload } from "@/auth/token.service.js";
 
 export const ROLES_KEY = "roles";
 
@@ -8,14 +14,17 @@ export const ROLES_KEY = "roles";
 export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
   canActivate(context: ExecutionContext): boolean {
-    const requiredRole = this.reflector.get<string[]>(
-      ROLES_KEY,
+    const required = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
       context.getHandler(),
-    );
-    if (!requiredRole) return true; // no rules required, allow
+      context.getClass(),
+    ]);
+    if (!required) return true;
 
-    const { user } = context.switchToHttp().getRequest();
-    const payload = user as AccessPayload;
-    return requiredRole.includes(payload.role);
+    const { user }: any = context.switchToHttp().getRequest();
+    if (!user) throw new UnauthorizedException(); // defencive; AuthGuard runs first
+    if (!required.includes(user.role)) {
+      throw new ForbiddenException("Insufficient permissions.");
+    }
+    return true;
   }
 }

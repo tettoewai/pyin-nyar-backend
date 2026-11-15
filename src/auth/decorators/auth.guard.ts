@@ -2,13 +2,14 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  HttpException,
   Injectable,
   Logger,
   UnauthorizedException,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { IS_PUBLIC_KEY } from "./public.decorator.js";
-import { TokenService } from "../token.service.js";
+import { IS_PUBLIC_KEY } from "@/auth/decorators/public.decorator.js";
+import { TokenService } from "@/auth/token.service.js";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -27,28 +28,31 @@ export class AuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
+    const request = context.switchToHttp().getRequest();
+    const authorization: string | undefined = request.headers?.authorization;
+
+    if (!authorization) {
+      throw new UnauthorizedException("Missing Authorization header.");
+    }
+
+    // "Bearer <jwt>" — strict split
+    const [scheme, token] = authorization.split(" ");
+    if (scheme !== "Bearer" || !token) {
+      throw new UnauthorizedException(
+        "Invalid Authorization format. Use: Bearer <token>",
+      );
+    }
     try {
-      const request = context.switchToHttp().getRequest();
-      const { authorization }: any = request.headers;
-
-      if (!authorization) {
-        throw new UnauthorizedException("Missing Authorization header.");
-      }
-
-      // "Bearer <jwt>" — strict split
-      const [scheme, token] = authorization.split(" ");
-      if (scheme !== "Bearer" || !token) {
-        throw new UnauthorizedException(
-          "Invalid Authorization format. Use: Bearer <token>",
-        );
-      }
       request.user = await this.tokenService.verifyToken(token.trim());
       return true;
     } catch (error: any) {
-      this.logger.error(`auth error - ${error.message}`);
-      throw new ForbiddenException(
-        error.message || "Session expired! Please sign in",
+      // verifyToken already normalises to UnauthorizedException — preserve it.
+      if (error instanceof HttpException) throw error;
+
+      this.logger.warn(
+        `auth failure: ${error instanceof Error ? error.name : "unknown"}`,
       );
+      throw new UnauthorizedException("Invalid or expired access token.");
     }
   }
 }
