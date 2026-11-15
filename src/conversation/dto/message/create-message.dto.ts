@@ -7,7 +7,7 @@ import {
   IsString,
   Min,
 } from "class-validator";
-import { MessageRole } from "../../../generated/prisma.bak/enums.js";
+import { MessageRole } from "@/generated/prisma/enums.js";
 
 export class CreateMessageDto {
   @ApiProperty({

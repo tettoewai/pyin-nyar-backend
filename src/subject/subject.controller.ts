@@ -1,6 +1,6 @@
 import { Controller, Get } from "@nestjs/common";
-import { Public } from "../auth/decorators/public.decorator.js";
-import { SubjectService } from "./subject.service.js";
+import { Public } from "@/auth/decorators/public.decorator.js";
+import { SubjectService } from "@/subject/subject.service.js";
 
 @Public()
 @Controller("subject")

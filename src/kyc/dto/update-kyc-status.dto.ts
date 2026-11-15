@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsOptional, IsString } from "class-validator";
-import { KycStatus } from "../../generated/prisma.bak/enums.js";
+import { KycStatus } from "@/generated/prisma/enums.js";
 
 export class UpdateKycStatusDto {
   @ApiProperty({

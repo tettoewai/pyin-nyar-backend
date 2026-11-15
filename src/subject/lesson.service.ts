@@ -5,11 +5,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { dataOf, success } from "../common/api-response.js";
-import { PrismaService } from "../prisma/prisma.service.js";
-import { CreateLessonDto } from "./dto/lesson/create-lesson.dto.js";
-import { UpdateLessonDto } from "./dto/lesson/update-lesson.dto.js";
-import { ReorderLessonsDto } from "./dto/lesson/reorder-lessons.dto.js";
+import { dataOf, success } from "@/common/api-response.js";
+import { PrismaService } from "@/prisma/prisma.service.js";
+import { CreateLessonDto } from "@/subject/dto/lesson/create-lesson.dto.js";
+import { UpdateLessonDto } from "@/subject/dto/lesson/update-lesson.dto.js";
+import { ReorderLessonsDto } from "@/subject/dto/lesson/reorder-lessons.dto.js";
 
 @Injectable()
 export class LessonService {

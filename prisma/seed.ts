@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, Role } from "../src/generated/prisma.bak/client.js";
+import { PrismaClient, Role } from "@/generated/prisma/client.js";
 import * as argon2 from "argon2";
 
 const connectionString = `${process.env.DATABASE_URL}`;

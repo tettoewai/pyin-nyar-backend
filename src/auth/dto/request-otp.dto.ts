@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsIn, IsNotEmpty } from "class-validator";
-import type { OtpPurpose } from "../otp.service.js";
+import type { OtpPurpose } from "@/auth/otp.service.js";
 
 export class RequestOtpDto {
   @ApiProperty({

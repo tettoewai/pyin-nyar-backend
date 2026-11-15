@@ -1,5 +1,5 @@
 import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
-import { Grade, KycStatus } from "../../generated/prisma.bak/enums.js";
+import { Grade, KycStatus } from "@/generated/prisma/enums.js";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class GetKycQueryDto {

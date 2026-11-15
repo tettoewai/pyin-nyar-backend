@@ -1,16 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Difficulty } from "../../generated/prisma.bak/enums.js";
+import { Difficulty } from "@/generated/prisma/enums.js";
 
 export class CreateQuizDto {
-  @ApiProperty({
-    description: "The owner of the quiz (omit for system/template quizzes)",
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  userId?: string;
-
   @ApiProperty({ description: "The quiz title", example: "Forces and motion" })
   @IsNotEmpty()
   @IsString()

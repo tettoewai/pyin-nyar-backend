@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { Public } from "../auth/decorators/public.decorator.js";
-import { CurriculumQueryDto } from "./dto/curriculum-query.dto.js";
-import { SubjectService } from "./subject.service.js";
+import { Public } from "@/auth/decorators/public.decorator.js";
+import { CurriculumQueryDto } from "@/subject/dto/curriculum-query.dto.js";
+import { SubjectService } from "@/subject/subject.service.js";
 
 @Public()
 @Controller("curriculum")

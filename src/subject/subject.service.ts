@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service.js";
-import { Grade } from "../generated/prisma.bak/enums.js";
-import { dataOf, success } from "../common/api-response.js";
+import { PrismaService } from "@/prisma/prisma.service.js";
+import { Grade } from "@/generated/prisma/enums.js";
+import { dataOf, success } from "@/common/api-response.js";
 
 @Injectable()
 export class SubjectService {

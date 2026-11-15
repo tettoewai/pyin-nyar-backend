@@ -9,8 +9,8 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
-import { EmailService } from "../email/email.service.js";
-import { PrismaService } from "../prisma/prisma.service.js";
+import { EmailService } from "@/email/email.service.js";
+import { PrismaService } from "@/prisma/prisma.service.js";
 import { NotFoundError } from "rxjs";
 
 const OTP_TTL_MS = 5 * 60 * 1000;

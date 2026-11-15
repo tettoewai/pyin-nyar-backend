@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { CryptoService } from "./crypto.service.js";
+import { CryptoService } from "@/common/crypto.service.js";
 
 @Global()
 @Module({

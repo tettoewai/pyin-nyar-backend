@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { Public } from "../auth/decorators/public.decorator.js";
-import { LessonService } from "./lesson.service.js";
+import { Public } from "@/auth/decorators/public.decorator.js";
+import { LessonService } from "@/subject/lesson.service.js";
 
 @Public()
 @Controller()

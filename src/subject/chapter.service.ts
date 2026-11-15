@@ -5,11 +5,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { dataOf, success } from "../common/api-response.js";
-import { PrismaService } from "../prisma/prisma.service.js";
-import { CreateChapterDto } from "./dto/chapter/create-chapter.dto.js";
-import { UpdateChapterDto } from "./dto/chapter/update-chapter.dto.js";
-import { MoveChapterDto } from "./dto/chapter/move-chapter.dto.js";
+import { dataOf, success } from "@/common/api-response.js";
+import { PrismaService } from "@/prisma/prisma.service.js";
+import { CreateChapterDto } from "@/subject/dto/chapter/create-chapter.dto.js";
+import { UpdateChapterDto } from "@/subject/dto/chapter/update-chapter.dto.js";
+import { MoveChapterDto } from "@/subject/dto/chapter/move-chapter.dto.js";
 
 @Injectable()
 export class ChapterService {

@@ -3,11 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { dataOf, success } from "../common/api-response.js";
-import { Prisma } from "../generated/prisma.bak/client.js";
-import { Grade, KycStatus } from "../generated/prisma.bak/enums.js";
-import { PrismaService } from "../prisma/prisma.service.js";
-import { CryptoService } from "../common/crypto.service.js";
+import { dataOf, success } from "@/common/api-response.js";
+import { Prisma } from "@/generated/prisma/client.js";
+import { Grade, KycStatus } from "@/generated/prisma/enums.js";
+import { PrismaService } from "@/prisma/prisma.service.js";
+import { CryptoService } from "@/common/crypto.service.js";
 
 @Injectable()
 export class KycService {

@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
-import { AuthService } from "./auth.service.js";
-import { OtpService } from "./otp.service.js";
-import { PrismaModule } from "../prisma/prisma.module.js";
-import { EmailModule } from "../email/email.module.js";
-import { AuthController } from "./auth.controller.js";
+import { AuthService } from "@/auth/auth.service.js";
+import { OtpService } from "@/auth/otp.service.js";
+import { PrismaModule } from "@/prisma/prisma.module.js";
+import { EmailModule } from "@/email/email.module.js";
+import { AuthController } from "@/auth/auth.controller.js";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { TokenService } from "./token.service.js";
+import { TokenService } from "@/auth/token.service.js";
 
 @Module({
   imports: [

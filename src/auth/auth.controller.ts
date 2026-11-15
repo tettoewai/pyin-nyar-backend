@@ -7,20 +7,20 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { Public } from "./decorators/public.decorator.js";
-import { AuthService } from "./auth.service.js";
-import { AuthGuard } from "./decorators/auth.guard.js";
-import { CurrentUser } from "./decorators/user.decorator.js";
-import { LoginDto } from "./dto/login.dto.js";
-import { RefreshDto } from "./dto/refresh.dto.js";
-import { RequestOtpDto } from "./dto/request-otp.dto.js";
-import { SignupDto } from "./dto/sign-up.dto.js";
-import { OtpService } from "./otp.service.js";
-import { TokenService } from "./token.service.js";
-import type { AccessPayload } from "./token.service.js";
-import { GoogleLoginDto } from "./dto/google-login.dto.js";
-import { VerifyResetDto } from "./dto/verify-reset.dto.js";
-import { ConfirmResetDto } from "./dto/confirm-reset.dto.js";
+import { Public } from "@/auth/decorators/public.decorator.js";
+import { AuthService } from "@/auth/auth.service.js";
+import { AuthGuard } from "@/auth/decorators/auth.guard.js";
+import { CurrentUser } from "@/auth/decorators/user.decorator.js";
+import { LoginDto } from "@/auth/dto/login.dto.js";
+import { RefreshDto } from "@/auth/dto/refresh.dto.js";
+import { RequestOtpDto } from "@/auth/dto/request-otp.dto.js";
+import { SignupDto } from "@/auth/dto/sign-up.dto.js";
+import { OtpService } from "@/auth/otp.service.js";
+import { TokenService } from "@/auth/token.service.js";
+import type { AccessPayload } from "@/auth/token.service.js";
+import { GoogleLoginDto } from "@/auth/dto/google-login.dto.js";
+import { VerifyResetDto } from "@/auth/dto/verify-reset.dto.js";
+import { ConfirmResetDto } from "@/auth/dto/confirm-reset.dto.js";
 import { Throttle } from "@nestjs/throttler";
 
 @Controller("auth")

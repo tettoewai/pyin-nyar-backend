@@ -1,8 +1,8 @@
 import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { createHash, randomUUID } from "node:crypto";
-import { Role } from "../generated/prisma.bak/enums.js";
-import { PrismaService } from "../prisma/prisma.service.js";
+import { Role } from "@/generated/prisma/enums.js";
+import { PrismaService } from "@/prisma/prisma.service.js";
 import { ConfigService } from "@nestjs/config";
 
 // What goes inside the JWTs
