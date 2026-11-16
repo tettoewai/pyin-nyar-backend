@@ -4,7 +4,6 @@ import { PrismaModule } from "@/prisma/prisma.module.js";
 import { ChapterAdminController } from "@/subject/chapter-admin.controller.js";
 import { ChapterController } from "@/subject/chapter.controller.js";
 import { ChapterService } from "@/subject/chapter.service.js";
-import { CurriculumController } from "@/subject/curriculum.controller.js";
 import { LessonAdminController } from "@/subject/lesson-admin.controller.js";
 import { LessonController } from "@/subject/lesson.controller.js";
 import { LessonService } from "@/subject/lesson.service.js";
@@ -20,7 +19,6 @@ import { SubjectService } from "@/subject/subject.service.js";
     ChapterAdminController,
     LessonController,
     LessonAdminController,
-    CurriculumController,
   ],
   providers: [SubjectService, ChapterService, LessonService],
   imports: [PrismaModule, AuthModule],

@@ -9,6 +9,7 @@ export class CreateSubjectDto {
   name!: string;
 
   @ApiProperty({ description: "The subject code", example: "PHY-11" })
+  @IsNotEmpty()
   @IsString()
   code!: string;
 

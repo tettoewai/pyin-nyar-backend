@@ -1,5 +1,8 @@
+import { MasteryScope } from "@/generated/prisma/enums.js";
 import { ApiProperty } from "@nestjs/swagger";
 import {
+  IsEnum,
+  isEnum,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -15,20 +18,22 @@ export class CreateMasteryScoreDto {
   @IsString()
   userId!: string;
 
-  @ApiProperty({ description: "Optional subject scope", required: false })
-  @IsOptional()
-  @IsString()
-  subjectId?: string;
+  @ApiProperty({
+    description: "Mastery scope",
+    required: true,
+    enum: MasteryScope,
+  })
+  @IsNotEmpty()
+  @IsEnum(MasteryScope)
+  masteryScope!: MasteryScope;
 
-  @ApiProperty({ description: "Optional chapter scope", required: false })
-  @IsOptional()
+  @ApiProperty({
+    description: "Scope ID for the mastery scope",
+    required: true,
+  })
+  @IsNotEmpty()
   @IsString()
-  chapterId?: string;
-
-  @ApiProperty({ description: "Optional lesson scope", required: false })
-  @IsOptional()
-  @IsString()
-  lessonId?: string;
+  scopeId!: string;
 
   @ApiProperty({
     description: "Mastery score between 0 and 1",

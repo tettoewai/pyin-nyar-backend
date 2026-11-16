@@ -203,19 +203,18 @@ model OtpChallenge {
 model Subject {
   id             String          @id @default(cuid())
   name           String
-  code           String?
-  grade          Grade?
+  code           String
+  grade          Grade
   chapters       Chapter[]
   conversations  Conversation[]
   quizzes        Quiz[]
-  masteryScores  MasteryScore[]
   studyPlanItems StudyPlanItem[]
   studentKyc     StudentKyc[]    @relation("PreferredSubjects")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   deletedAt      DateTime?
 
-  @@unique([name, code, grade])
+  @@unique([grade, code])
 }
 
 model Chapter {
@@ -227,7 +226,6 @@ model Chapter {
   lessons        Lesson[]
   conversations  Conversation[]
   quizzes        Quiz[]
-  masteryScores  MasteryScore[]
   studyPlanItems StudyPlanItem[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -245,7 +243,6 @@ model Lesson {
   content        String? // markdown or plain text
   conversations  Conversation[]
   quizzes        Quiz[]
-  masteryScores  MasteryScore[]
   studyPlanItems StudyPlanItem[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -389,23 +386,25 @@ model Answer {
 
 // ---------- Mastery / Weakness Detection ----------
 
+enum MasteryScope {
+    SUBJECT
+    CHAPTER
+    LESSON
+}
+
 model MasteryScore {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subjectId String?
-  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  chapterId String?
-  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
-  lessonId  String?
-  lesson    Lesson?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  scopeType MasteryScope
+  scopeId   String
   score     Float    @default(0) // 0.0 – 1.0
   attempts  Int      @default(0)
   lastSeen  DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, lessonId])
-  @@index([userId, score])
+  @@unique([userId, scopeType, scopeId])
+  @@index([userId, scopeType, score])
 }
 
 // ---------- Study Plans ----------

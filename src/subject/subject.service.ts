@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { PrismaService } from "@/prisma/prisma.service.js";
 import { Grade } from "@/generated/prisma/enums.js";
 import { dataOf, success } from "@/common/api-response.js";
@@ -22,54 +28,17 @@ export class SubjectService {
     return dataOf(subjects);
   }
 
-  async findCurriculum(grade?: Grade) {
-    const subjects = await this.prisma.subject.findMany({
-      where: {
-        deletedAt: null,
-        ...(grade !== undefined && { grade }),
-      },
-      orderBy: { name: "asc" },
-      select: {
-        id: true,
-        name: true,
-        code: true,
-        grade: true,
-        createdAt: true,
-        updatedAt: true,
-        chapters: {
-          where: { deletedAt: null },
-          orderBy: { order: "asc" },
-          select: {
-            id: true,
-            subjectId: true,
-            name: true,
-            order: true,
-            createdAt: true,
-            updatedAt: true,
-            lessons: {
-              where: { deletedAt: null },
-              orderBy: { order: "asc" },
-              select: {
-                id: true,
-                chapterId: true,
-                name: true,
-                order: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    return dataOf(subjects);
-  }
-
   async create(name: string, code: string, grade: Grade) {
-    const subject = await this.prisma.subject.create({
-      data: { name, code, grade },
-    });
-    return success("Subject created successfully.", subject);
+    const normalized = this.normalizeCode(code);
+    try {
+      const subject = await this.prisma.subject.create({
+        data: { name, code: normalized, grade },
+      });
+      return success("Subject created successfully.", subject);
+    } catch (error) {
+      await this.rethrowIfDuplicate(error, grade, normalized);
+      throw error;
+    }
   }
 
   async update(id: string, name?: string, code?: string, grade?: Grade) {
@@ -79,15 +48,27 @@ export class SubjectService {
     });
     if (!existingSubject) throw new NotFoundException("Subject not found!");
 
-    const subject = await this.prisma.subject.update({
-      where: { id },
-      data: {
-        ...(name !== undefined && { name }),
-        ...(code !== undefined && { code }),
-        ...(grade !== undefined && { grade }),
-      },
-    });
-    return success("Subject updated successfully.", subject);
+    const normalized =
+      code === undefined ? undefined : this.normalizeCode(code);
+
+    try {
+      const subject = await this.prisma.subject.update({
+        where: { id },
+        data: {
+          ...(name !== undefined && { name }),
+          ...(normalized !== undefined && { code: normalized }),
+          ...(grade !== undefined && { grade }),
+        },
+      });
+      return success("Subject updated successfully.", subject);
+    } catch (error) {
+      if (this.isUniqueViolation(error)) {
+        throw new ConflictException(
+          "Another subject already uses this code for that grade.",
+        );
+      }
+      throw error;
+    }
   }
 
   async delete(id: string) {
@@ -113,5 +94,46 @@ export class SubjectService {
       },
     });
     return success("Subject restored successfully.");
+  }
+
+  /**
+   * Codes are the stable identity now that `@@unique([grade, code])` replaced
+   * the old name-bearing key, so whitespace would fork a subject in two.
+   */
+  private normalizeCode(code: string): string {
+    const normalized = code.trim();
+    if (!normalized) {
+      throw new BadRequestException("Subject code cannot be blank.");
+    }
+    return normalized;
+  }
+
+  private isUniqueViolation(error: unknown): boolean {
+    return (
+      error instanceof PrismaClientKnownRequestError && error.code === "P2002"
+    );
+  }
+
+  /**
+   * A soft-deleted subject still occupies its (grade, code) slot, so a plain
+   * "already exists" message would leave the admin with no way forward.
+   */
+  private async rethrowIfDuplicate(
+    error: unknown,
+    grade: Grade,
+    code: string,
+  ): Promise<void> {
+    if (!this.isUniqueViolation(error)) return;
+
+    const existing = await this.prisma.subject.findFirst({
+      where: { grade, code },
+      select: { id: true, deletedAt: true },
+    });
+    if (existing?.deletedAt) {
+      throw new ConflictException(
+        `Subject ${code} for ${grade} exists but is deleted. Restore it instead: PATCH /admin/subject/${existing.id}/restore`,
+      );
+    }
+    throw new ConflictException(`Subject ${code} already exists for ${grade}.`);
   }
 }
