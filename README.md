@@ -75,6 +75,57 @@ pnpm run test:cov     # vitest run --coverage
 pnpm run test:e2e     # vitest --config ./vitest.config.e2e.ts
 ```
 
+## Seed data
+
+The seed script creates an admin user, imports the Grade 12 curriculum
+(Myanmar, English, Mathematics, Physics, Chemistry) from the markdown bundles in
+the workspace `curriculum/` folder into `Subject -> Chapter -> Lesson`, and then
+adds a demo dataset so every screen has data to render once the UI is wired up.
+
+```bash
+pnpm db:seed                     # admin + curriculum + demo data
+pnpm db:seed:curriculum          # curriculum only
+pnpm db:seed:curriculum --dry-run  # parse the corpus, print a report, no DB
+```
+
+Demo accounts (all password `Passw0rd!` unless noted):
+
+| Email                          | Role               |
+| ------------------------------ | ------------------ |
+| `saya_maung@pyinnyar.com`      | TEACHER            |
+| `sayarma_thida@pyinnyar.com`   | TEACHER            |
+| `sayar_aung@pyinnyar.com`      | TEACHER            |
+| `sayarma_nilar@pyinnyar.com`   | TEACHER            |
+| `sayar_ko@pyinnyar.com`        | TEACHER            |
+| `sayarma_hla@pyinnyar.com`     | TEACHER            |
+| `student.aungmin@pyinnyar.com` | STUDENT            |
+| `student.sumyat@pyinnyar.com`  | STUDENT            |
+| `student.kyaw@pyinnyar.com`    | STUDENT            |
+| `parent.uaye@pyinnyar.com`     | PARENT             |
+| `parent.dawmya@pyinnyar.com`   | PARENT             |
+| `admin@pyinnyar.com`           | ADMIN (`admin123`) |
+
+The demo dataset covers the whole app surface: profiles; KYC records in
+`PENDING`, `APPROVED` and `REJECTED` states (only when
+`KYC_ENCRYPTION_KEY`/`KYC_INDEX_KEY` are set); a teacher chat thread per
+subject; six system quizzes with question banks; completed, in-progress and
+abandoned attempts with answers; mastery scores at subject and chapter scope
+(including weak topics); two study plans with items; uploads with extracted
+text; and usage logs. It also adds a **Biology** subject with placeholder
+lessons because the mobile UI shows six subjects and the corpus has no Biology.
+Demo seeding is skipped when `NODE_ENV=production` unless `SEED_DEMO=true`.
+
+Notes:
+
+- The importer is idempotent: it upserts on natural keys (and deterministic ids
+  for demo rows), so running it again does not duplicate data. Lesson bodies are
+  only overwritten when a body was actually extracted, so hand-authored content
+  survives a re-run.
+- Source location defaults to `../curriculum` (sibling of this project). Override
+  with `CURRICULUM_DIR=/path/to/curriculum`.
+- Physics ships as a table of contents only and Chemistry is partial, so some
+  lessons have no body. That matches the corpus and is reported by `--dry-run`.
+
 ## API overview
 
 Swagger: `/api`
