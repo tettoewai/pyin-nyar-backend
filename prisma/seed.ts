@@ -3,12 +3,15 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Role } from "@/generated/prisma/client.js";
 import * as argon2 from "argon2";
+import { seedCurriculum } from "./seed/curriculum/seed-curriculum.js";
+import { seedDemoData } from "./seed/demo/index.js";
 
 const connectionString = `${process.env.DATABASE_URL}`;
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-async function main() {
+
+async function seedAdmin() {
   const adminPassword = await argon2.hash("admin123");
   const admin = await prisma.user.upsert({
     where: { email: "admin@pyinnyar.com" },
@@ -27,6 +30,13 @@ async function main() {
   });
   console.log(`${admin.name} was created successfully`);
 }
+
+async function main() {
+  await seedAdmin();
+  await seedCurriculum(prisma);
+  await seedDemoData(prisma);
+}
+
 main()
   .then(async () => {
     await prisma.$disconnect();
