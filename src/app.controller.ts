@@ -9,8 +9,7 @@ export class AppController {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  @Get()
-  @Get("health")
+  @Get(["", "health"])
   async health() {
     let dbStatus = "unreachable";
     try {
